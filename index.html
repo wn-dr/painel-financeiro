@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finanças Pessoais - Wander Tech+</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -23,18 +24,55 @@
 </head>
 <body class="text-slate-800 dark:text-slate-200 font-sans antialiased p-4 md:p-8">
 
-<div class="max-w-[1500px] mx-auto">
-    <header class="flex justify-between items-center mb-10">
+<!-- Container de Autenticação -->
+<div id="auth-container" class="auth-container">
+    <div class="glass p-8 rounded-[3rem] border-white/60 auth-card space-y-6">
+        <div class="text-center space-y-2">
+            <h2 id="auth-title" class="text-3xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">Login</h2>
+            <p id="auth-subtitle" class="text-[10px] font-mono font-bold text-indigo-500/60 uppercase tracking-widest">Acesse sua conta Wander Tech+</p>
+        </div>
+
+        <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+            <div class="space-y-1">
+                <label class="text-[9px] font-black text-slate-400 ml-2 uppercase">E-mail</label>
+                <input id="auth-email" type="email" placeholder="seu@email.com" required class="w-full bg-white/50 dark:bg-slate-900/40 p-4 rounded-2xl text-sm outline-none border border-transparent focus:border-indigo-500 font-bold placeholder:opacity-30">
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[9px] font-black text-slate-400 ml-2 uppercase">Senha</label>
+                <input id="auth-password" type="password" placeholder="••••••••" required class="w-full bg-white/50 dark:bg-slate-900/40 p-4 rounded-2xl text-sm outline-none border border-transparent focus:border-indigo-500 font-bold placeholder:opacity-30">
+            </div>
+
+            <div id="auth-message" class="text-xs text-red-500 font-bold text-center hidden"></div>
+
+            <button type="submit" id="auth-btn" class="btn-press w-full bg-slate-900 dark:bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-xl transition-all text-xs uppercase tracking-widest mt-2">
+                Entrar
+            </button>
+        </form>
+
+        <div class="text-center pt-2">
+            <button onclick="toggleAuthMode()" id="auth-toggle-link" class="text-[9px] font-black text-indigo-500 hover:text-indigo-600 uppercase tracking-widest transition-all">
+                Não tem uma conta? Cadastre-se
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Container Principal da Aplicação (Oculto até autenticar) -->
+<div id="app-container" class="max-w-[1500px] mx-auto auth-hidden">
+    <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
         <div>
             <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tighter uppercase">
                 Finanças <span class="text-indigo-600 dark:text-indigo-500">Pessoais</span>
             </h1>
             <p class="text-[11px] font-mono font-bold text-indigo-500/60 tracking-[0.4em] uppercase mt-1">Wander Tech+</p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3 justify-center">
+            <span id="user-email-display" class="text-[10px] font-mono font-bold uppercase opacity-60 mr-2 bg-indigo-500/10 text-indigo-600 px-3 py-1.5 rounded-xl border border-indigo-500/5"></span>
             <button onclick="exportarExcel()" class="btn-press bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black px-6 py-3.5 rounded-2xl transition-all shadow-lg shadow-emerald-500/20 uppercase">Exportar Filtrados</button>
             <button onclick="resetarGeral()" class="btn-press glass p-3.5 rounded-2xl text-red-500 hover:bg-red-500/10" title="Reset Total"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
             <button onclick="toggleDarkMode()" class="btn-press glass p-3.5 rounded-2xl text-amber-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9 9 0 0021.027 16.779c.142-.12.33-.314.327-.425z" /></svg></button>
+            <button onclick="handleLogout()" class="btn-press bg-red-500/10 hover:bg-red-500/20 text-red-500 text-[10px] font-black px-5 py-3.5 rounded-2xl transition-all uppercase tracking-widest">Sair</button>
         </div>
     </header>
 
