@@ -1,5 +1,5 @@
-let supabaseUrl = '';
-let supabaseKey = '';
+let supabaseUrl = typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : '__SUPABASE_URL__';
+let supabaseKey = typeof SUPABASE_ANON_KEY !== 'undefined' ? SUPABASE_ANON_KEY : '__SUPABASE_ANON_KEY__';
 
 // Se os placeholders não forem substituídos ou estiver rodando localmente, usamos fallbacks
 if (supabaseUrl.startsWith('__') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || !window.location.hostname) {
