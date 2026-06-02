@@ -7,7 +7,7 @@ if (supabaseUrl.startsWith('__') || window.location.hostname === 'localhost' || 
     supabaseKey = 'sb_publishable_OdPlzvmWxEv4bNi7mXpyLw_ADEc_5hj';
 }
 
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 let sessionUser = null;
 let listResponsaveis = [];
@@ -74,7 +74,7 @@ function configurarEventosCriacao() {
             const nome = prompt('Digite o nome do novo cartão/método de pagamento:');
             if (nome && nome.trim()) {
                 const cor = prompt('Digite a cor hexadecimal do cartão (ex: #8b5cf6):', '#64748b');
-                const { data, error } = await supabase.from('cartoes').insert({
+                const { data, error } = await supabaseClient.from('cartoes').insert({
                     user_id: sessionUser.id,
                     nome: nome.trim(),
                     cor: cor || '#64748b'
@@ -96,7 +96,7 @@ function configurarEventosCriacao() {
         if (e.target.value === 'ADD_NEW') {
             const nome = prompt('Digite o nome da nova categoria:');
             if (nome && nome.trim()) {
-                const { data, error } = await supabase.from('categorias').insert({
+                const { data, error } = await supabaseClient.from('categorias').insert({
                     user_id: sessionUser.id,
                     nome: nome.trim()
                 }).select();
@@ -116,13 +116,13 @@ function configurarEventosCriacao() {
 
 // Carregar Configurações (Responsáveis, Categorias e Cartões)
 async function carregarConfiguracoes() {
-    let { data: resps } = await supabase.from('responsaveis').select('*').order('nome');
+    let { data: resps } = await supabaseClient.from('responsaveis').select('*').order('nome');
     listResponsaveis = resps || [];
     
-    let { data: cats } = await supabase.from('categorias').select('*').order('nome');
+    let { data: cats } = await supabaseClient.from('categorias').select('*').order('nome');
     listCategorias = cats || [];
     
-    let { data: cards } = await supabase.from('cartoes').select('*').order('nome');
+    let { data: cards } = await supabaseClient.from('cartoes').select('*').order('nome');
     listCartoes = cards || [];
 
     preencherSelect('responsavel', listResponsaveis, 'id', 'nome', 'RESPONSÁVEL');
@@ -160,7 +160,7 @@ function mostrarSugestoes() {
 
 // Carregar Dados dos Lançamentos do Supabase
 async function carregarDados() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('lancamentos')
         .select('*, responsaveis(nome), cartoes(nome, cor), categorias(nome)');
     
@@ -298,7 +298,7 @@ async function adicionar(){
         if (respObj) {
             responsavel_id = respObj.id;
         } else {
-            const { data, error } = await supabase.from('responsaveis').insert({
+            const { data, error } = await supabaseClient.from('responsaveis').insert({
                 user_id: sessionUser.id,
                 nome: respName
             }).select();
@@ -317,9 +317,9 @@ async function adicionar(){
     // 2. Se for edição, limpa os antigos antes de reinserir
     if(idEdicao) {
         if(gId && confirm("Esta compra faz parte de um parcelamento. Deseja aplicar as alterações a TODAS as parcelas deste grupo?")) {
-            await supabase.from('lancamentos').delete().eq('grupo_id', gId);
+            await supabaseClient.from('lancamentos').delete().eq('grupo_id', gId);
         } else {
-            await supabase.from('lancamentos').delete().eq('id', idEdicao);
+            await supabaseClient.from('lancamentos').delete().eq('id', idEdicao);
         }
     }
 
@@ -362,7 +362,7 @@ async function adicionar(){
         }
     }
 
-    const { error } = await supabase.from('lancamentos').insert(rowsToInsert);
+    const { error } = await supabaseClient.from('lancamentos').insert(rowsToInsert);
     if (error) {
         alert('Erro ao salvar no banco de dados: ' + error.message);
     } else {
@@ -413,10 +413,10 @@ async function remover(id){
     if(confirm(msg)){ 
         let error = null;
         if(item.grupo_id) {
-            const { error: err } = await supabase.from('lancamentos').delete().eq('grupo_id', item.grupo_id);
+            const { error: err } = await supabaseClient.from('lancamentos').delete().eq('grupo_id', item.grupo_id);
             error = err;
         } else {
-            const { error: err } = await supabase.from('lancamentos').delete().eq('id', id); 
+            const { error: err } = await supabaseClient.from('lancamentos').delete().eq('id', id); 
             error = err;
         }
 
@@ -461,7 +461,7 @@ function limparFiltros() {
 // Reset Geral (Deleta tudo do Usuário no Supabase)
 async function resetarGeral() {
     if(confirm('ATENÇÃO: Isso apagará TODOS os seus lançamentos salvos permanentemente no Supabase. Deseja continuar?')) {
-        const { error } = await supabase.from('lancamentos').delete().eq('user_id', sessionUser.id);
+        const { error } = await supabaseClient.from('lancamentos').delete().eq('user_id', sessionUser.id);
         if (error) {
             alert('Erro ao limpar lançamentos: ' + error.message);
         } else {
@@ -546,9 +546,9 @@ async function handleAuthSubmit(event) {
 
     let result;
     if (isLoginMode) {
-        result = await supabase.auth.signInWithPassword({ email, password });
+        result = await supabaseClient.auth.signInWithPassword({ email, password });
     } else {
-        result = await supabase.auth.signUp({ email, password });
+        result = await supabaseClient.auth.signUp({ email, password });
     }
 
     const { data, error } = result;
@@ -596,7 +596,7 @@ function updateAuthUI() {
 }
 
 async function handleLogout() {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
 }
 
 // Controle de Telas
@@ -621,7 +621,7 @@ async function showApp() {
 // Inicializar Verificação de Sessão
 async function init() {
     // Escuta mudanças de auth do Supabase
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
         if (session) {
             sessionUser = session.user;
             showApp();
@@ -631,7 +631,7 @@ async function init() {
         }
     });
 
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
         sessionUser = session.user;
         showApp();
