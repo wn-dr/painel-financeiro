@@ -1,156 +1,167 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finanças Glass iOS</title>
+    <title>Finanças Pessoais - Wander Tech+</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    }
-                }
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                } 
             }
         }
     </script>
-
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="text-slate-800 dark:text-slate-200 min-h-screen font-sans antialiased">
+<body class="text-slate-800 dark:text-slate-200 font-sans antialiased p-4 md:p-8">
 
-<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-400/20 blur-[120px] rounded-full z-[-1]"></div>
-<div class="fixed bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-blue-400/20 blur-[100px] rounded-full z-[-1]"></div>
-
-<div class="max-w-7xl mx-auto p-4 md:p-8 relative">
-    
-    <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 pb-8 border-b border-white/20 dark:border-slate-800 text-center md:text-left">
-        <div class="flex flex-col md:flex-row items-center gap-8">
-            <div>
-                <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight uppercase italic drop-shadow-sm">
-                    Finanças <span class="text-indigo-600 dark:text-indigo-400">Pessoais</span>
-                </h1>
-                <p class="text-[13px] font-mono font-bold text-slate-500 dark:text-slate-400 mt-2 tracking-[0.25em] uppercase opacity-90">
-                    Config <span class="text-indigo-500">wn-dr</span>
-                </p>
-            </div>
-            
-            <div class="flex gap-4 items-center glass px-6 py-3 rounded-2xl border-white/40 shadow-sm">
-                <a href="https://github.com" target="_blank" class="transition-all duration-300 hover:scale-110 active:scale-90 text-slate-900 dark:text-white opacity-60 hover:opacity-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
-                </a>
-                <a href="https://instagram.com" target="_blank" class="transition-all duration-300 hover:scale-110 active:scale-90 text-pink-600 dark:text-pink-400 opacity-60 hover:opacity-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
-                </a>
-                <a href="https://linkedin.com" target="_blank" class="transition-all duration-300 hover:scale-110 active:scale-90 text-blue-600 dark:text-blue-400 opacity-60 hover:opacity-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg>
-                </a>
-            </div>
+<div class="max-w-[1500px] mx-auto">
+    <header class="flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tighter uppercase">
+                Finanças <span class="text-indigo-600 dark:text-indigo-500">Pessoais</span>
+            </h1>
+            <p class="text-[11px] font-mono font-bold text-indigo-500/60 tracking-[0.4em] uppercase mt-1">Wander Tech+</p>
         </div>
-
-        <div class="flex flex-wrap justify-center items-center gap-3">
-            <button onclick="exportarExcel()" class="flex items-center gap-2 text-[10px] font-bold bg-emerald-600/80 hover:bg-emerald-600 text-white px-5 py-3 rounded-2xl transition-all shadow-lg uppercase tracking-wider">
-                Excel
-            </button>
-            <button onclick="toggleDarkMode()" class="glass p-3 rounded-2xl text-slate-600 dark:text-amber-400 hover:scale-105 transition-all shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9 9 0 0021.027 16.779c.142-.12.33-.314.327-.425z" /></svg>
-            </button>
-            <button onclick="resetar()" class="text-[10px] font-semibold text-red-500 bg-red-500/10 hover:bg-red-500/20 px-4 py-3 rounded-2xl transition-all border border-red-500/10 uppercase">Resetar</button>
+        <div class="flex items-center gap-3">
+            <button onclick="exportarExcel()" class="btn-press bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black px-6 py-3.5 rounded-2xl transition-all shadow-lg shadow-emerald-500/20 uppercase">Exportar Filtrados</button>
+            <button onclick="resetarGeral()" class="btn-press glass p-3.5 rounded-2xl text-red-500 hover:bg-red-500/10" title="Reset Total"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+            <button onclick="toggleDarkMode()" class="btn-press glass p-3.5 rounded-2xl text-amber-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9 9 0 0021.027 16.779c.142-.12.33-.314.327-.425z" /></svg></button>
         </div>
     </header>
 
-    <div class="grid lg:grid-cols-4 gap-8">
-        <div class="lg:col-span-1">
-            <div class="glass p-6 rounded-[2.5rem] shadow-xl sticky top-4">
-                <h3 class="text-sm font-bold mb-6 flex items-center gap-2 text-slate-900 dark:text-white uppercase tracking-wider">
-                    <span class="w-2 h-4 bg-indigo-500 rounded-full"></span> Novo Registro
-                </h3>
-                <div class="space-y-4">
-                    <input id="descricao" type="text" placeholder="Descrição" class="w-full bg-white/50 dark:bg-slate-800/50 border-white/30 dark:border-slate-700 border p-3 rounded-2xl transition-all text-xs" />
+    <div class="grid lg:grid-cols-12 gap-10 items-start">
+        
+        <aside class="lg:col-span-4 sticky-panel">
+            <div class="glass p-8 rounded-[3rem] border-white/60 custom-scroll">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center gap-2">
+                        <div class="h-1.5 w-8 bg-indigo-600 rounded-full"></div>
+                        <h3 class="text-[12px] font-black uppercase text-slate-400 tracking-[0.2em]">Novo Lançamento</h3>
+                    </div>
+                    <button onclick="limparCamposLancamento(true)" class="text-[9px] font-black text-slate-400 hover:text-indigo-500 uppercase tracking-widest transition-all">Limpar Painel</button>
+                </div>
+                
+                <div class="space-y-5">
+                    <input type="hidden" id="editandoId" value="">
+                    <input type="hidden" id="grupoId" value="">
+                    
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-slate-400 ml-2 uppercase">Descrição</label>
+                        <input id="descricao" type="text" placeholder="EX: REPARO NOTEBOOK" class="w-full bg-white/50 dark:bg-slate-900/40 p-4 rounded-2xl text-sm outline-none border border-transparent focus:border-indigo-500 font-bold placeholder:opacity-30">
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-slate-400 ml-2 uppercase">Valor do Gasto</label>
+                        <input id="valor" placeholder="R$ 0,00" class="w-full bg-indigo-600/5 dark:bg-indigo-500/10 p-5 rounded-2xl font-black text-indigo-600 dark:text-indigo-400 text-2xl font-mono outline-none border border-transparent focus:border-indigo-500 transition-all">
+                    </div>
                     
                     <div class="grid grid-cols-2 gap-3">
-                        <input id="valor" placeholder="R$ 0,00" class="w-full bg-white/50 dark:bg-slate-800/50 border-white/30 dark:border-slate-700 border p-3 rounded-2xl font-bold text-indigo-600 dark:text-indigo-400 text-xs font-mono" />
-                        <div class="flex gap-1">
-                            <select id="mes_cal" class="w-full bg-white/50 dark:bg-slate-800/50 border-white/30 p-2 rounded-2xl text-[10px] cursor-pointer"></select>
-                            <select id="ano_cal" class="w-full bg-white/50 dark:bg-slate-800/50 border-white/30 p-2 rounded-2xl text-[10px] cursor-pointer"></select>
-                        </div>
+                        <select id="mes_cal" class="filter-input w-full"></select>
+                        <select id="ano_cal" class="filter-input w-full"></select>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <select id="responsavel" class="w-full bg-white/50 dark:bg-slate-800/50 border-white/30 p-3 rounded-2xl text-[10px]"></select>
-                        <select id="cartao" class="w-full bg-white/50 dark:bg-slate-800/50 border-white/30 p-3 rounded-2xl text-[10px]"></select>
+                    <div class="space-y-2">
+                        <input id="responsavel" type="text" placeholder="RESPONSÁVEL" class="filter-input w-full" autocomplete="off" onfocus="mostrarSugestoes()" oninput="mostrarSugestoes()">
+                        <div id="sugestoesResponsavel" class="flex flex-wrap gap-2 px-2"></div>
                     </div>
 
-                    <select id="categoria" class="w-full bg-white/50 dark:bg-slate-800/50 border-white/30 p-3 rounded-2xl text-[10px]"></select>
-
-                    <div class="bg-white/30 dark:bg-slate-800/30 p-4 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
-                        <label class="flex items-center gap-2 cursor-pointer mb-3">
-                            <input type="checkbox" id="mensal" class="w-4 h-4 rounded text-indigo-600"/> 
-                            <span class="text-[11px] font-bold uppercase opacity-70">Gasto Fixo</span>
+                    <select id="cartao" class="filter-input w-full"></select>
+                    <select id="categoria" class="filter-input w-full"></select>
+                    
+                    <div class="p-5 rounded-3xl bg-indigo-600/5 dark:bg-white/5 border border-indigo-500/10 space-y-4">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="checkbox" id="mensal" class="w-5 h-5 rounded-lg border-none bg-indigo-200 text-indigo-600 focus:ring-0">
+                            <span class="text-[11px] font-black text-slate-500 uppercase group-hover:text-indigo-500 transition-colors">Gasto Mensal Fixo</span>
                         </label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <select id="parcelaAtual" class="w-full text-[10px] bg-white/50 dark:bg-slate-800/50 border-white/30 p-2 rounded-xl"></select>
-                            <select id="parcelasTotal" class="w-full text-[10px] bg-white/50 dark:bg-slate-800/50 border-white/30 p-2 rounded-xl"></select>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <span class="text-[8px] font-black text-slate-400 ml-1 uppercase">Parcela Atual</span>
+                                <select id="parcelaAtual" class="w-full bg-white/40 dark:bg-slate-900/40 p-3 rounded-xl text-[10px] font-bold"></select>
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-[8px] font-black text-slate-400 ml-1 uppercase">Total de Parcelas</span>
+                                <select id="parcelasTotal" class="w-full bg-white/40 dark:bg-slate-900/40 p-3 rounded-xl text-[10px] font-bold"></select>
+                            </div>
                         </div>
                     </div>
-                    <button onclick="adicionar()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-95 uppercase tracking-widest text-[10px]">Salvar</button>
+
+                    <button onclick="adicionar()" class="btn-press w-full bg-slate-900 dark:bg-indigo-600 hover:bg-indigo-700 text-white font-black py-5 rounded-[2rem] shadow-xl transition-all text-[11px] uppercase tracking-widest mt-4">Confirmar e Salvar</button>
                 </div>
             </div>
-        </div>
+        </aside>
 
-        <div class="lg:col-span-3 space-y-6">
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div class="glass p-5 rounded-[2.5rem] shadow-lg">
-                    <p class="text-[9px] uppercase font-bold text-slate-400 mb-1">Total Filtrado</p>
-                    <h2 id="totalFiltrado" class="text-2xl font-mono font-bold text-indigo-600 dark:text-indigo-400 tracking-tight">R$ 0,00</h2>
+        <main class="lg:col-span-8 space-y-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="glass p-6 rounded-[2.5rem]">
+                    <p class="text-[10px] font-black text-indigo-500 uppercase mb-2 tracking-widest">Total Filtrado</p>
+                    <h2 id="totalFiltrado" class="text-2xl font-mono font-bold tracking-tighter">R$ 0,00</h2>
                 </div>
-                <div class="glass p-5 rounded-[2.5rem] shadow-lg">
-                    <p class="text-[9px] uppercase font-bold text-slate-400 mb-1">Acumulado Geral</p>
-                    <h2 id="totalGeral" class="text-2xl font-mono font-bold text-slate-900 dark:text-white tracking-tight">R$ 0,00</h2>
+                <div class="glass p-6 rounded-[2.5rem]">
+                    <p class="text-[10px] font-black text-emerald-500 uppercase mb-2 tracking-widest">Gastos Fixos</p>
+                    <h2 id="totalFixos" class="text-2xl font-mono font-bold tracking-tighter text-slate-400">R$ 0,00</h2>
                 </div>
-                <div class="hidden md:flex glass p-4 rounded-[2.5rem] items-center justify-center">
-                    <div class="relative h-14 w-full"><canvas id="grafico"></canvas></div>
+                
+                <div class="glass p-6 rounded-[2.5rem] flex flex-col items-center justify-center relative min-h-[160px]">
+                    <p class="absolute top-4 text-[9px] font-black uppercase text-slate-400">Por Cartão</p>
+                    <div class="flex items-center w-full gap-4 mt-6">
+                        <div class="w-1/2 h-20"><canvas id="graficoCartao"></canvas></div>
+                        <div id="legendaCartao" class="w-1/2 text-[9px] font-bold space-y-1 overflow-y-auto max-h-24 custom-scroll"></div>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-[2.5rem] flex flex-col items-center justify-center relative min-h-[160px]">
+                    <p class="absolute top-4 text-[9px] font-black uppercase text-slate-400">Por Categoria</p>
+                    <div class="w-full h-20 mt-6"><canvas id="graficoCategoria"></canvas></div>
                 </div>
             </div>
 
-            <div class="glass p-3 rounded-2xl shadow-md grid grid-cols-2 md:grid-cols-5 gap-2">
-                <input id="filtroNome" placeholder="🔍 Buscar..." class="col-span-2 md:col-span-1 text-[11px] bg-white/40 dark:bg-slate-800/40 border-white/20 border px-3 py-2 rounded-xl" oninput="render()" />
-                <div class="flex gap-1">
-                    <select id="filtroMes_cal" class="text-[10px] bg-white/40 dark:bg-slate-800/40 border-white/20 border p-1 rounded-xl w-full" onchange="render()"></select>
-                    <select id="filtroAno_cal" class="text-[10px] bg-white/40 dark:bg-slate-800/40 border-white/20 border p-1 rounded-xl w-full" onchange="render()"></select>
+            <section class="glass rounded-[3rem] p-8 border-indigo-500/10">
+                <div class="flex items-center justify-between mb-6">
+                    <p class="text-[10px] font-black text-indigo-500/60 uppercase tracking-[0.3em]">Filtros Inteligentes</p>
+                    <button onclick="limparFiltros()" class="text-[9px] font-black text-slate-400 hover:text-red-500 uppercase tracking-widest transition-colors opacity-50 hover:opacity-100">Limpar Filtros</button>
                 </div>
-                <select id="filtroCartao" class="text-[10px] bg-white/40 border-white/20 border p-2 rounded-xl" onchange="render()"></select>
-                <select id="filtroCategoria" class="text-[10px] bg-white/40 border-white/20 border p-2 rounded-xl" onchange="render()"></select>
-                <select id="filtroResponsavel" class="text-[10px] bg-white/40 border-white/20 border p-2 rounded-xl" onchange="render()"></select>
-            </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <input type="text" id="f_busca" oninput="render()" placeholder="O QUE PROCURA?" class="filter-input w-full">
+                    <select id="f_responsavel" onchange="render()" class="filter-input w-full"></select>
+                    <select id="f_categoria" onchange="render()" class="filter-input w-full"></select>
+                    
+                    <select id="f_cartao" onchange="render()" class="filter-input w-full"></select>
+                    <div class="grid grid-cols-2 gap-3">
+                        <select id="f_mes" onchange="render()" class="filter-input w-full"></select>
+                        <select id="f_ano" onchange="render()" class="filter-input w-full"></select>
+                    </div>
+                    <button onclick="enviarWhatsAppResponsavel()" class="btn-press bg-green-600 hover:bg-green-500 text-white rounded-[1.2rem] text-[11px] font-black uppercase shadow-lg shadow-green-500/20 py-3">
+                        WhatsApp
+                    </button>
+                </div>
+            </section>
 
-            <div class="glass rounded-[2rem] shadow-xl overflow-hidden">
-                <div class="overflow-x-auto custom-scroll">
-                    <table class="w-full text-left">
-                        <thead class="bg-white/20 dark:bg-slate-800/50 text-[9px] font-bold text-slate-400 uppercase tracking-widest border-b border-white/10">
+            <div class="glass rounded-[3rem] overflow-hidden mb-12">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-indigo-500/5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-white/10">
                             <tr>
-                                <th class="p-5">Mês</th>
-                                <th class="p-5">Tags</th>
-                                <th class="p-5">Descrição</th>
-                                <th class="p-5 text-right">Valor</th>
-                                <th class="p-5 text-center"></th>
+                                <th class="py-6 px-8 text-left">Data</th>
+                                <th class="py-6 px-8 text-left">Método</th>
+                                <th class="py-6 px-8 text-left">Lançamento</th>
+                                <th class="py-6 px-8 text-right">Valor</th>
                             </tr>
                         </thead>
-                        <tbody id="tabela" class="divide-y divide-white/10 dark:divide-slate-800/50 text-xs"></tbody>
+                        <tbody id="tabela" class="divide-y divide-white/5"></tbody>
                     </table>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 </div>
 

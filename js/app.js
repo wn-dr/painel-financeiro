@@ -1,165 +1,330 @@
 let dados = JSON.parse(localStorage.getItem('dados')) || [];
-let chart;
+let chartCartao, chartCategoria;
 
-const responsaveis = ['Amor', 'Wandernilson', 'Gabriel', 'Isabelle', 'Jean', 'Jeiciane', 'Luiz', 'Lukas', 'Mãe', 'Matteus G', 'Pai', 'Thaynara', 'Wilber', 'Ynaiara'];
-const cartoes = ['Nubank','PicPay','Next','Inter','C6','Mercado Pago'];
-const categorias = ['Alimentação','Assinatura','Compras','Consulta','Dentista','Eletrônico','Empréstimo','Exame','Faculdade/Pós','Farmácia','Imposto','Internet','Internet Móvel','Investimentos','Manutenção','Pagamento','Parcela Casa','Pets','Pix mensal','Plano de saúde','Plano odontológico','Reserva de emergência','Roupas','Salão/Barbearia','Saúde pessoal','Supermercado','Transporte','Transporte público'];
-const nomesMeses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-const anosDisponiveis = [2025, 2026, 2027, 2028, 2029, 2030];
+const cartoes = ['Nubank','PicPay','Next','Inter','C6','Mercado Pago','Pix','Dinheiro','Outros'];
+const categorias = ['Alimentação','Assinatura','Compras','Consulta','Dentista','Eletrônico','Empréstimo','Exame','Faculdade/Pós','Farmácia','Imposto','Juros','Internet','Internet Móvel','Investimentos','Manutenção','Pagamento','Parcela Casa','Pets','Pix mensal','Plano de saúde','Plano odontológico','Reserva de emergência','Roupas','Salão/Barbearia','Saúde pessoal','Supermercado','Transporte','Transporte público'];
+const nomesMeses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+const anosD = [2026, 2027, 2028, 2029, 2030];
 
-function setupCalendario(idMes, idAno, labelMes, labelAno) {
-    const selMes = document.getElementById(idMes);
-    const selAno = document.getElementById(idAno);
-    selMes.innerHTML = `<option value="" selected>${labelMes}</option>`;
-    nomesMeses.forEach((m, idx) => { selMes.innerHTML += `<option value="${(idx+1).toString().padStart(2,'0')}">${m}</option>`; });
-    selAno.innerHTML = `<option value="" selected>${labelAno}</option>`;
-    anosDisponiveis.forEach(a => { selAno.innerHTML += `<option value="${a}">${a}</option>`; });
-}
+const configCores = { 
+    'Nubank': '#8b5cf6', 'Inter': '#f97316', 'C6': '#1e293b', 'Next': '#22c55e', 
+    'PicPay': '#10b981', 'Mercado Pago': '#3b82f6', 'Pix': '#06b6d4', 
+    'Dinheiro': '#475569', 'Outros': '#94a3b8' 
+};
 
-function preencher(id, lista, label){
+function preencher(id, lista, label){ 
     const el = document.getElementById(id);
-    el.innerHTML = `<option value="">${label}</option>`;
-    lista.forEach(i => el.innerHTML += `<option value="${i}">${i}</option>`);
+    if(!el) return;
+    el.innerHTML = `<option value="">${label}</option>`; 
+    lista.forEach(i => el.innerHTML += `<option value="${i}">${i}</option>`); 
 }
 
-preencher('responsavel', responsaveis, 'Responsável');
-preencher('cartao', cartoes, 'Cartão');
-preencher('categoria', categorias, 'Categoria');
-preencher('filtroCartao', cartoes, 'Cartão');
-preencher('filtroCategoria', categorias, 'Categoria');
-preencher('filtroResponsavel', responsaveis, 'Responsável');
-
-setupCalendario('mes_cal', 'ano_cal', 'Mês', 'Ano');
-setupCalendario('filtroMes_cal', 'filtroAno_cal', 'Mês', 'Ano');
-
-for(let i=1;i<=12;i++){
-    parcelaAtual.innerHTML += `<option value="${i}">${i}ª</option>`;
-    parcelasTotal.innerHTML += `<option value="${i}">${i}x</option>`;
+function atualizarFiltroResponsavel() {
+    const respsUnicos = [...new Set(dados.map(d => d.responsavel))].filter(r => r && r !== 'N/A').sort();
+    preencher('f_responsavel', respsUnicos, 'QUEM?');
 }
+
+function mostrarSugestoes() {
+    const input = document.getElementById('responsavel');
+    const container = document.getElementById('sugestoesResponsavel');
+    const termo = input.value.toLowerCase();
+    
+    const respsUnicos = [...new Set(dados.map(d => d.responsavel))].filter(r => r && r !== 'N/A');
+    
+    container.innerHTML = '';
+    respsUnicos.forEach(nome => {
+        if (nome.toLowerCase().includes(termo)) {
+            const btn = document.createElement('button');
+            btn.className = "text-[9px] font-black px-3 py-1.5 rounded-full bg-indigo-500/10 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all uppercase tracking-tighter";
+            btn.innerText = nome;
+            btn.onclick = () => {
+                input.value = nome;
+                container.innerHTML = '';
+            };
+            container.appendChild(btn);
+        }
+    });
+}
+
+preencher('cartao', cartoes, 'MÉTODO');
+preencher('f_cartao', cartoes, 'MÉTODO');
+preencher('categoria', categorias, 'CATEGORIA');
+preencher('f_categoria', categorias, 'CATEGORIA');
+
+[document.getElementById('mes_cal'), document.getElementById('f_mes')].forEach(el => {
+    el.innerHTML = `<option value="">MÊS</option>`;
+    nomesMeses.forEach((m, idx) => el.innerHTML += `<option value="${(idx+1).toString().padStart(2,'0')}">${m}</option>`);
+});
+
+[document.getElementById('ano_cal'), document.getElementById('f_ano')].forEach(el => {
+    el.innerHTML = `<option value="">ANO</option>`;
+    anosD.forEach(a => el.innerHTML += `<option value="${a}">${a}</option>`);
+});
+
+const pA = document.getElementById('parcelaAtual');
+const pT = document.getElementById('parcelasTotal');
+for(let i = 1; i <= 12; i++){
+    pA.innerHTML += `<option value="${i}">${i}ª</option>`;
+    pT.innerHTML += `<option value="${i}">${i}x</option>`;
+}
+pT.value = "1";
 
 const inputValor = document.getElementById('valor');
-inputValor.oninput = e => {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value === '') { e.target.value = ''; return; }
-    let floatValue = parseFloat(value) / 100;
-    e.target.value = floatValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
-
-function parseValor(v){
-    return parseFloat(v.replace(/[R$\s.]/g, '').replace(',', '.')) || 0;
-}
+inputValor.oninput = e => { 
+    let v = e.target.value.replace(/\D/g, ''); 
+    if (!v) { e.target.value = ''; return; } 
+    e.target.value = (parseFloat(v)/100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); 
+};
 
 function adicionar(){
-    const vMes = document.getElementById('mes_cal').value;
-    const vAno = document.getElementById('ano_cal').value;
-    if(!descricao.value || !inputValor.value || !vMes || !vAno) return alert('Campos obrigatórios vazios!');
-    
-    const valorNum = parseValor(inputValor.value);
-    const respons = responsavel.value || 'N/A';
-    const cart = cartao.value || 'N/A';
-    const cat = categoria.value || 'Geral';
-    const desc = descricao.value;
+    const vMes = document.getElementById('mes_cal').value; 
+    const vAno = document.getElementById('ano_cal').value; 
+    const vCartao = document.getElementById('cartao').value;
+    const desc = document.getElementById('descricao').value.trim();
+    const resp = document.getElementById('responsavel').value.trim() || 'N/A';
+    const valorNum = parseFloat(inputValor.value.replace(/[R$\s.]/g, '').replace(',', '.')) || 0;
+    const idEdicao = document.getElementById('editandoId').value;
+    const gId = document.getElementById('grupoId').value;
 
-    if(mensal.checked){
-        dados.push({ responsavel: respons, mes: `${vAno}-${vMes}`, cartao: cart, categoria: cat, descricao: desc, parcela: 'Fixo', valor: valorNum, id: Date.now() });
+    if(!desc || !valorNum || !vMes || !vAno || !vCartao) return alert('Preencha os campos obrigatórios!');
+
+    if(idEdicao) {
+        if(gId && confirm("Esta compra faz parte de um parcelamento. Deseja aplicar as alterações a TODAS as parcelas deste grupo?")) {
+            dados = dados.filter(d => d.grupoId !== gId);
+        } else {
+            dados = dados.filter(d => d.id != idEdicao);
+        }
+    }
+
+    const novoGrupoId = Date.now().toString();
+
+    if(document.getElementById('mensal').checked){
+        dados.push({ responsavel: resp, mes: `${vAno}-${vMes}`, cartao: vCartao, categoria: document.getElementById('categoria').value || 'Geral', descricao: desc.toUpperCase(), parcela: 'Fixo', valor: valorNum, id: Date.now(), grupoId: novoGrupoId });
     } else {
-        const pAtual = parseInt(parcelaAtual.value) || 1;
-        const pTotal = parseInt(parcelasTotal.value) || 1;
-        let startMonth = parseInt(vMes);
-        let startYear = parseInt(vAno);
-        
-        for(let i = pAtual; i <= pTotal; i++) {
-            let dataRef = new Date(startYear, (startMonth - 1) + (i - pAtual), 1);
-            let mesFormat = `${dataRef.getFullYear()}-${(dataRef.getMonth()+1).toString().padStart(2,'0')}`;
+        const atual = parseInt(pA.value);
+        const total = parseInt(pT.value);
+        if (atual > total) return alert('A parcela atual não pode ser maior que o total!');
+
+        for(let i = atual; i <= total; i++) {
+            let saltoMes = i - atual;
+            let dR = new Date(parseInt(vAno), (parseInt(vMes)-1) + saltoMes, 1);
             dados.push({ 
-                responsavel: respons, 
-                mes: mesFormat, 
-                cartao: cart, 
-                categoria: cat, 
-                descricao: pTotal > 1 ? `${desc} (${i}/${pTotal})` : desc, 
-                parcela: pTotal > 1 ? `${i}/${pTotal}` : 'À vista', 
+                responsavel: resp, 
+                mes: `${dR.getFullYear()}-${(dR.getMonth()+1).toString().padStart(2,'0')}`, 
+                cartao: vCartao, 
+                categoria: document.getElementById('categoria').value || 'Geral', 
+                descricao: desc.toUpperCase(), 
+                parcela: total > 1 ? `${i}/${total}` : 'À vista', 
                 valor: valorNum, 
-                id: Date.now() + i 
+                id: Date.now() + i,
+                grupoId: total > 1 ? novoGrupoId : null
             });
         }
     }
-    localStorage.setItem('dados', JSON.stringify(dados));
-    descricao.value = ''; inputValor.value = ''; render();
+    localStorage.setItem('dados', JSON.stringify(dados)); 
+    atualizarFiltroResponsavel();
+    render();
+    limparCamposLancamento(false);
+    document.getElementById('editandoId').value = "";
+    document.getElementById('grupoId').value = "";
+    document.getElementById('descricao').focus();
+}
+
+function editar(id) {
+    const item = dados.find(d => d.id == id);
+    if(!item) return;
+
+    const [ano, mes] = item.mes.split('-');
+    document.getElementById('editandoId').value = item.id;
+    document.getElementById('grupoId').value = item.grupoId || "";
+    document.getElementById('descricao').value = item.descricao;
+    document.getElementById('valor').value = item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('mes_cal').value = mes;
+    document.getElementById('ano_cal').value = ano;
+    document.getElementById('responsavel').value = item.responsavel;
+    document.getElementById('cartao').value = item.cartao;
+    document.getElementById('categoria').value = item.categoria;
+    
+    if(item.parcela === 'Fixo') {
+        document.getElementById('mensal').checked = true;
+    } else {
+        document.getElementById('mensal').checked = false;
+        const partes = item.parcela.split('/');
+        document.getElementById('parcelaAtual').value = partes[0] || "1";
+        document.getElementById('parcelasTotal').value = partes[1] || "1";
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function obterDadosFiltrados() {
+    return dados.filter(d => {
+        const [ano, mes] = d.mes.split('-');
+        return d.descricao.toLowerCase().includes(document.getElementById('f_busca').value.toLowerCase()) &&
+               (!document.getElementById('f_responsavel').value || d.responsavel === document.getElementById('f_responsavel').value) &&
+               (!document.getElementById('f_categoria').value || d.categoria === document.getElementById('f_categoria').value) &&
+               (!document.getElementById('f_cartao').value || d.cartao === document.getElementById('f_cartao').value) &&
+               (!document.getElementById('f_mes').value || mes === document.getElementById('f_mes').value) &&
+               (!document.getElementById('f_ano').value || ano === document.getElementById('f_ano').value);
+    }).sort((a,b) => a.mes.localeCompare(b.mes));
 }
 
 function render(){
-    const fMes = document.getElementById('filtroMes_cal').value;
-    const fAno = document.getElementById('filtroAno_cal').value;
-    const lista = dados.filter(d => {
-        let matchData = true;
-        if(fAno && fMes) matchData = (d.mes === `${fAno}-${fMes}`);
-        else if(fAno) matchData = d.mes.startsWith(fAno);
-        else if(fMes) matchData = d.mes.endsWith(fMes);
-        return (!filtroNome.value || d.descricao.toLowerCase().includes(filtroNome.value.toLowerCase())) && matchData &&
-        (!filtroCartao.value || d.cartao === filtroCartao.value) && (!filtroCategoria.value || d.categoria === filtroCategoria.value) && (!filtroResponsavel.value || d.responsavel === filtroResponsavel.value);
-    });
+    const filtrados = obterDadosFiltrados();
+    const tab = document.getElementById('tabela');
+    tab.innerHTML = '';
+    let tf = 0, tx = 0;
 
-    tabela.innerHTML='';
-    let totalF=0, totalG=0;
-    dados.forEach(d=> totalG+=d.valor);
-
-    lista.sort((a,b) => a.mes.localeCompare(b.mes)).forEach((d)=>{
-        totalF+=d.valor;
+    filtrados.forEach(d => {
+        tf += d.valor;
+        if(d.parcela === 'Fixo') tx += d.valor;
         const [ano, mes] = d.mes.split('-');
-        tabela.innerHTML+=`
-        <tr class="hover:bg-white/20 transition-colors">
-            <td class="p-5 text-[9px] font-bold text-slate-400">${nomesMeses[parseInt(mes)-1]} ${ano}</td>
-            <td class="p-5">
-                <div class="flex flex-wrap gap-1">
-                    <span class="px-2 py-0.5 rounded-md text-[8px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/10">${d.categoria}</span>
-                    <span class="px-2 py-0.5 rounded-md text-[8px] font-bold bg-slate-500/10 text-slate-500 border border-slate-500/10">${d.cartao}</span>
-                </div>
-            </td>
-            <td class="p-5">
-                <div class="font-bold text-slate-800 dark:text-slate-200">${d.descricao}</div>
-                <div class="text-[8px] opacity-50 uppercase">${d.responsavel} • ${d.parcela}</div>
-            </td>
-            <td class="p-5 text-right font-mono font-bold text-indigo-600 dark:text-indigo-400">R$ ${d.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-            <td class="p-5 text-center">
-                <button onclick="remover(${d.id})" class="text-slate-300 hover:text-red-500 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                </button>
-            </td>
-        </tr>`;
+        tab.innerHTML += `
+            <tr onclick="editar(${d.id})" class="group hover:bg-indigo-500/[0.03] transition-all cursor-pointer btn-press">
+                <td class="py-6 px-8 font-mono text-[10px] opacity-40 uppercase">${nomesMeses[parseInt(mes)-1]} / ${ano}</td>
+                <td class="py-6 px-8">
+                    <span class="inline-block px-3 py-1 rounded-lg text-[9px] font-black text-white uppercase tracking-wider" style="background:${configCores[d.cartao] || '#64748b'}">
+                        ${d.cartao}
+                    </span>
+                </td>
+                <td class="py-6 px-8">
+                    <div class="flex flex-col">
+                        <span class="font-bold text-[14px] text-slate-700 dark:text-slate-200 uppercase tracking-tight">${d.descricao}</span>
+                        <span class="text-[9px] opacity-40 font-black uppercase tracking-[0.1em] mt-0.5">${d.responsavel} • ${d.categoria} • ${d.parcela}</span>
+                    </div>
+                </td>
+                <td class="py-6 px-8 text-right">
+                    <div class="flex flex-col items-end">
+                        <span class="font-mono font-bold text-indigo-600 dark:text-indigo-400 text-[16px]">R$ ${d.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                        <button onclick="event.stopPropagation(); remover(${d.id})" class="text-red-400 opacity-0 group-hover:opacity-100 text-[9px] font-black uppercase mt-1 tracking-widest hover:text-red-600 transition-all">Remover</button>
+                    </div>
+                </td>
+            </tr>
+        `;
     });
-    totalFiltrado.innerText='R$ '+totalF.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-    totalGeral.innerText='R$ '+totalG.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-    renderChart(lista);
+
+    document.getElementById('totalFiltrado').innerText = 'R$ ' + tf.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    document.getElementById('totalFixos').innerText = 'R$ ' + tx.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    renderCharts(filtrados);
 }
 
-function renderChart(lista){
-    let cat={};
-    lista.forEach(d=> cat[d.categoria]=(cat[d.categoria]||0)+d.valor);
-    if(chart) chart.destroy();
-    chart=new Chart(grafico,{
-        type:'doughnut',
-        data:{
-            labels:Object.keys(cat),
-            datasets:[{ data:Object.values(cat), backgroundColor:['#6366f1','#10b981','#f59e0b','#ec4899','#06b6d4','#8b5cf6','#ef4444'], borderWidth:0 }]
-        },
-        options: { plugins: { legend: { display: false } }, cutout: '80%', maintainAspectRatio: false }
+function renderCharts(lista){
+    let catMap = {}, cartMap = {};
+    lista.forEach(d => {
+        catMap[d.categoria] = (catMap[d.categoria] || 0) + d.valor;
+        cartMap[d.cartao] = (cartMap[d.cartao] || 0) + d.valor;
     });
+
+    const leg = document.getElementById('legendaCartao');
+    leg.innerHTML = '';
+    Object.keys(cartMap).forEach(c => {
+        leg.innerHTML += `
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full" style="background:${configCores[c] || '#ccc'}"></div>
+                <span class="uppercase tracking-tighter opacity-70">${c}</span>
+            </div>
+        `;
+    });
+
+    const cfg = { cutout: '75%', maintainAspectRatio: false, plugins: { legend: { display: false } } };
+    if(chartCartao) chartCartao.destroy();
+    chartCartao = new Chart(document.getElementById('graficoCartao'), { type: 'doughnut', data: { datasets: [{ data: Object.values(cartMap), backgroundColor: Object.keys(cartMap).map(c => configCores[c] || '#ccc'), borderWidth: 0 }] }, options: cfg });
+    if(chartCategoria) chartCategoria.destroy();
+    chartCategoria = new Chart(document.getElementById('graficoCategoria'), { type: 'doughnut', data: { datasets: [{ data: Object.values(catMap), backgroundColor: Object.keys(catMap).map((_, i) => `hsl(${i * 45}, 70%, 60%)`), borderWidth: 0 }] }, options: cfg });
 }
 
-function toggleDarkMode() {
-    document.documentElement.classList.toggle('dark');
-    localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+function remover(id){ 
+    const item = dados.find(d => d.id == id);
+    if(!item) return;
+    
+    let msg = 'Excluir este lançamento?';
+    if(item.grupoId) msg = 'Esta compra é parcelada. Deseja excluir TODAS as parcelas deste grupo?';
+
+    if(confirm(msg)){ 
+        if(item.grupoId) {
+            dados = dados.filter(d => d.grupoId !== item.grupoId);
+        } else {
+            dados = dados.filter(d => d.id !== id); 
+        }
+        localStorage.setItem('dados', JSON.stringify(dados)); 
+        render(); 
+    } 
+}
+
+function limparCamposLancamento(completo = false) {
+    document.getElementById('editandoId').value = '';
+    document.getElementById('grupoId').value = '';
+    document.getElementById('descricao').value = '';
+    document.getElementById('valor').value = '';
+    document.getElementById('responsavel').value = '';
+    document.getElementById('categoria').value = '';
+    document.getElementById('mensal').checked = false;
+    document.getElementById('parcelaAtual').value = "1";
+    document.getElementById('parcelasTotal').value = "1";
+    document.getElementById('sugestoesResponsavel').innerHTML = '';
+    if(completo) {
+        document.getElementById('mes_cal').value = '';
+        document.getElementById('ano_cal').value = '';
+        document.getElementById('cartao').value = '';
+    }
+}
+
+function limparFiltros() {
+    document.getElementById('f_busca').value = '';
+    document.getElementById('f_responsavel').value = '';
+    document.getElementById('f_categoria').value = '';
+    document.getElementById('f_cartao').value = '';
+    document.getElementById('f_mes').value = '';
+    document.getElementById('f_ano').value = '';
     render();
 }
-if(localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
 
-function exportarExcel() {
-    const ws = XLSX.utils.json_to_sheet(dados);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Finanças");
-    XLSX.writeFile(wb, "Financas_Glass.xlsx");
+function resetarGeral() {
+    if(confirm('ATENÇÃO: Isso apagará TODOS os lançamentos salvos permanentemente. Deseja continuar?')) {
+        localStorage.clear();
+        location.reload();
+    }
 }
 
-function remover(id){ if(confirm('Excluir este item?')){ dados = dados.filter(d => d.id !== id); localStorage.setItem('dados', JSON.stringify(dados)); render(); } }
-function resetar(){ if(confirm('Tudo será apagado. Continuar?')){ localStorage.removeItem('dados'); dados=[]; render(); } }
+function toggleDarkMode(){ document.documentElement.classList.toggle('dark'); }
+
+function exportarExcel() {
+    const filtrados = obterDadosFiltrados();
+    if (filtrados.length === 0) return alert('Não há dados para exportar.');
+    
+    const ws = XLSX.utils.json_to_sheet(filtrados);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Dados Filtrados");
+    XLSX.writeFile(wb, "Financeiro_WanderTech_Filtrado.xlsx");
+}
+
+function enviarWhatsAppResponsavel() {
+    const filtrados = obterDadosFiltrados();
+    if (filtrados.length === 0) return alert('Não há dados filtrados para compartilhar.');
+
+    const respFiltro = document.getElementById('f_responsavel').value;
+    const titulo = respFiltro ? `RELATÓRIO - ${respFiltro.toUpperCase()}` : 'RELATÓRIO FINANCEIRO';
+    
+    let mensagem = `${titulo}\n\n`;
+    let total = 0;
+
+    filtrados.forEach((i, index) => { 
+        total += i.valor; 
+        const valorFormatado = i.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        const [ano, mes] = i.mes.split('-');
+        const mesNome = nomesMeses[parseInt(mes)-1];
+
+        mensagem += `${index + 1}. ${i.descricao}\n`;
+        mensagem += `Data: ${mesNome}/${ano}\n`;
+        mensagem += `Método: ${i.cartao}\n`;
+        mensagem += `Categoria: ${i.categoria}\n`;
+        mensagem += `Parcela: ${i.parcela}\n`;
+        mensagem += `Valor: R$ ${valorFormatado}\n\n`;
+    });
+
+    mensagem += `TOTAL FILTRADO: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+    const linkFinal = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+    window.open(linkFinal);
+}
+
+atualizarFiltroResponsavel();
 render();
