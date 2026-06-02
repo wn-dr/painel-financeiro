@@ -15,11 +15,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Inject Supabase Credentials
+      - name: Generate Supabase config from GitHub Secrets
         run: |
-          # Substitui os placeholders em js/app.js pelas chaves reais configuradas no GitHub Secrets
-          sed -i "s|__SUPABASE_URL__|${{ secrets.SUPABASE_URL }}|g" js/app.js
-          sed -i "s|__SUPABASE_ANON_KEY__|${{ secrets.SUPABASE_ANON_KEY }}|g" js/app.js
+          mkdir -p js
+          cat > js/config.js <<'EOF'
+          const SUPABASE_URL = "${{ secrets.SUPABASE_URL }}";
+          const SUPABASE_ANON_KEY = "${{ secrets.SUPABASE_ANON_KEY }}";
+          EOF
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
